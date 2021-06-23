@@ -37,7 +37,7 @@ def cmd(command):
         s = ser.read(13)
         if (s == b''):
             break
-        print(binascii.hexlify(s, ' '))
+        # print(binascii.hexlify(s, ' '))
         res.append(s)
     return res
 
