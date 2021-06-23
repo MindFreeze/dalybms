@@ -90,7 +90,7 @@ def get_battery_state():
     json = '{'
     json += '"voltage":' + str(voltage) + ','
     json += '"aquisition":' + str(aquisition) + ','
-    json += '"current":' + str(current) + ','
+    json += '"current":' + str(round(current, 1)) + ','
     json += '"soc":' + str(soc)
     json += '}'
     print(json)
