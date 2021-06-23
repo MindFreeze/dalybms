@@ -1,6 +1,6 @@
 {
     "name": "Daly Smart BMS",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "slug": "dalybms",
     "description": "Monitors a Daly Smart BMS through UART USB",
     "arch": ["amd64", "armv7", "i386"],
@@ -23,9 +23,9 @@
         "mqtt_user": "str",
         "mqtt_pass": "str",
         "mqtt_client_id": "str",
-        "mqtt_topic_parallel": "str",
-        "mqtt_topic_settings": "str",
         "mqtt_topic": "str",
+        "mqtt_topic_cells": "str",
+        "mqtt_topic_discovery": "str",
         "device": "str"
     }
 }
