@@ -73,7 +73,9 @@ def get_cell_balance(cell_count):
     min_v = min(cells)
     max_v = max(cells)
     json += '"min":' + str(min_v) + ','
+    json += '"minCell":' + str(cells.index(min_v) + 1) + ','
     json += '"max":' + str(max_v) + ','
+    json += '"maxCell":' + str(cells.index(max_v) + 1) + ','
     json += '"diff":' + str(round(max_v - min_v, 3))
     json += '}'
     print(json)
