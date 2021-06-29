@@ -7,3 +7,7 @@ Based on the protocol docs found here https://github.com/jblance/mpp-solar/blob/
 
 
 The main code is in monitor.py, if you want to expand or change it.
+
+## TODO
+- get temperature
+- get mosfets state
