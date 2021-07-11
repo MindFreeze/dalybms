@@ -8,6 +8,11 @@ Based on the protocol docs found here https://github.com/jblance/mpp-solar/blob/
 
 The main code is in monitor.py, if you want to expand or change it.
 
+## Install
+
+Add https://github.com/MindFreeze/home-assistant-addons to the addon store repositories and you will get a Daly Smart BMS listed there.
+Note that this assumes the BMS is /dev/ttyUSB0. If you have other USB to Serial devices connected this might be wrong.
+
 ## TODO
 - get temperature
 - get mosfets state
