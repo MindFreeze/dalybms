@@ -100,7 +100,7 @@ def get_battery_state():
 
 while True:
     get_battery_state()
-    get_cell_balance(16)
+    get_cell_balance(int(os.environ['CELL_COUNT']))
     time.sleep(2)
     
 ser.close()

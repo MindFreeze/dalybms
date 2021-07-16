@@ -1,6 +1,6 @@
 {
     "name": "Daly Smart BMS",
-    "version": "1.1.2",
+    "version": "1.2.0",
     "slug": "dalybms",
     "description": "Monitors a Daly Smart BMS through UART USB",
     "arch": ["amd64", "armv7", "i386"],
@@ -15,15 +15,17 @@
         "mqtt_client_id": "dalybms",
         "mqtt_discovery_prefix": "homeassistant",
         "device": "/dev/ttyUSB0",
-        "device_id": "Daly-Smart-BMS"
+        "device_id": "Daly-Smart-BMS",
+        "cells_in_series": null
     },
     "schema": {
         "mqtt_server": "str",
         "mqtt_user": "str",
-        "mqtt_pass": "str",
+        "mqtt_pass": "password",
         "mqtt_client_id": "str",
         "mqtt_discovery_prefix": "str",
         "device": "str",
-        "device_id": "str"
+        "device_id": "str",
+        "cells_in_series": "int(1,)"
     }
 }
