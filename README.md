@@ -13,6 +13,12 @@ The main code is in monitor.py, if you want to expand or change it.
 Add https://github.com/MindFreeze/home-assistant-addons to the addon store repositories and you will get a Daly Smart BMS listed there.
 Note that this assumes the BMS is /dev/ttyUSB0. If you have other USB to Serial devices connected this might be wrong.
 
+## Energy and power
+
+You can do this easily. For power in `W`, just create a template sensor and multiply `current * voltage`. https://www.home-assistant.io/integrations/template/
+
+Then to get `kWh` for energy you can create an integration sensor from the power sensor. https://www.home-assistant.io/integrations/integration/
+
 ## TODO
 - get temperature
 - get mosfets state
