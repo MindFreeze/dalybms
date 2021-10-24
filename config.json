@@ -16,7 +16,7 @@
         "mqtt_discovery_prefix": "homeassistant",
         "device": "/dev/ttyUSB0",
         "device_id": "Daly-Smart-BMS",
-        "cells_in_series": null
+        "cells_in_series": 4
     },
     "schema": {
         "mqtt_server": "str",
