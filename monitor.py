@@ -63,6 +63,9 @@ def extract_cells_v(buffer):
 
 def get_cell_balance(cell_count):
     res = cmd(b'\xa5\x40\x95\x08\x00\x00\x00\x00\x00\x00\x00\x00\x82')
+    if len(res) < 1:
+        print('Empty response get_cell_balance')
+        return
     cells = []
     for frame in res:
         cells += extract_cells_v(frame)
@@ -89,6 +92,7 @@ def get_cell_balance(cell_count):
 def get_battery_state():
     res = cmd(b'\xa5\x40\x90\x08\x00\x00\x00\x00\x00\x00\x00\x00\x7d')
     if len(res) < 1:
+        print('Empty response get_battery_state')
         return
     buffer = res[0]
     voltage = int.from_bytes(buffer[4:6], byteorder='big', signed=False) / 10
@@ -108,6 +112,7 @@ def get_battery_state():
 def get_battery_status():
     res = cmd(b'\xa5\x40\x94\x08\x00\x00\x00\x00\x00\x00\x00\x00\x81')
     if len(res) < 1:
+        print('Empty response get_battery_status')
         return
     buffer = res[0]
     batt_string = int.from_bytes(buffer[4:5], byteorder='big', signed=False)
