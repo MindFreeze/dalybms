@@ -9,6 +9,8 @@ import time
 import os
 import paho.mqtt.client as mqtt
 
+print('Starting BMS monitor...')
+
 # ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)  # open serial port
 ser = serial.Serial(os.environ['DEVICE'], 9600, timeout=1)  # open serial port
 
@@ -25,7 +27,7 @@ deviceConf = '"device": {"manufacturer": "Dongfuan Daly Electronics", "name": "S
 # publish MQTT Discovery configs to Home Assistant
 socHaConf = '{"device_class": "battery", "name": "Battery SOC", "state_topic": "' + STATE_TOPIC +'/state", "unit_of_measurement": "%", "value_template": "{{ value_json.soc}}", "unique_id": "' + devId + '_soc", ' + deviceConf + ', "json_attributes_topic": "' + STATUS_TOPIC + '/state"}' 
 client.publish(STATE_TOPIC +'_soc/config', socHaConf, 0, True)
-voltageHaConf = '{"device_class": "voltage", "name": "Battery Voltage", "state_topic": "' + STATE_TOPIC +'/state", "unit_of_measurement": "V", "value_template": "{{ value_json.voltage}}", "unique_id": "' + devId + '_voltage", ' + deviceConf + '}' 
+voltageHaConf = '{"device_class": "voltage", "name": "Battery Voltage", "state_topic": "' + STATE_TOPIC +'/state", "unit_of_measurement": "V", "value_template": "{{ value_json.voltage}}", "unique_id": "' + devId + '_voltage", ' + deviceConf + '}'
 client.publish(STATE_TOPIC + '_voltage/config', voltageHaConf, 0, True)
 currentHaConf = '{"device_class": "current", "name": "Battery Current", "state_topic": "' + STATE_TOPIC +'/state", "unit_of_measurement": "A", "value_template": "{{ value_json.current}}", "unique_id": "' + devId + '_current", ' + deviceConf + '}' 
 client.publish(STATE_TOPIC + '_current/config', currentHaConf, 0, True)
@@ -34,8 +36,9 @@ CELLS_TOPIC = STATE_TOPIC + '_balance'
 cellsHaConf = '{"device_class": "voltage", "name": "Battery Cell Balance", "state_topic": "' + CELLS_TOPIC + '/state", "unit_of_measurement": "V", "value_template": "{{ value_json.diff}}", "json_attributes_topic": "' + CELLS_TOPIC + '/state", "unique_id": "' + devId + '_balance", ' + deviceConf + '}' 
 client.publish(CELLS_TOPIC + '/config', cellsHaConf, 0, True)
 
-tempHaConf = '{"device_class": "temperature", "name": "Battery Temperature", "state_topic": "' + STATUS_TOPIC + '/state", "unit_of_measurement": "°C", "value_template": "{{ value_json.temp}}", "unique_id": "' + devId + '_temp", ' + deviceConf + '}' 
-client.publish(STATUS_TOPIC + '_temp/config', tempHaConf, 0, True)
+TEMP_TOPIC = STATE_TOPIC + '_temp'
+tempHaConf = '{"device_class": "temperature", "name": "Battery Temperature", "state_topic": "' + TEMP_TOPIC + '/state", "unit_of_measurement": "°C", "value_template": "{{ value_json.value}}", "unique_id": "' + devId + '_temp", ' + deviceConf + ', "json_attributes_topic": "' + TEMP_TOPIC + '/state"}'
+client.publish(TEMP_TOPIC + '/config', tempHaConf, 0, True)
 
 def cmd(command):
     res = []
@@ -111,11 +114,13 @@ def get_battery_state():
 
 def get_battery_status():
     res = cmd(b'\xa5\x40\x94\x08\x00\x00\x00\x00\x00\x00\x00\x00\x81')
+    print(res)
     if len(res) < 1:
         print('Empty response get_battery_status')
         return
     buffer = res[0]
     batt_string = int.from_bytes(buffer[4:5], byteorder='big', signed=False)
+    # this temperature seems to always be 1
     temp = int.from_bytes(buffer[5:6], byteorder='big', signed=False)
     charger = 'true' if int.from_bytes(buffer[6:7], byteorder='big', signed=False) == 1 else 'false'
     load = 'true' if int.from_bytes(buffer[7:8], byteorder='big', signed=False) == 1 else 'false'
@@ -132,11 +137,33 @@ def get_battery_status():
     # print(json)
     publish(STATUS_TOPIC +'/state', json)
 
+def get_battery_temp():
+    res = cmd(b'\xa5\x40\x92\x08\x00\x00\x00\x00\x00\x00\x00\x00\x7f')
+    if len(res) < 1:
+        print('Empty response get_battery_temp')
+        return
+    buffer = res[0]
+    maxTemp = int.from_bytes(buffer[4:5], byteorder='big', signed=False) - 40
+    maxTempCell = int.from_bytes(buffer[5:6], byteorder='big', signed=False)
+    minTemp = int.from_bytes(buffer[6:7], byteorder='big', signed=False) - 40
+    minTempCell = int.from_bytes(buffer[7:8], byteorder='big', signed=False)
+
+    json = '{'
+    json += '"value":' + str((maxTemp + minTemp) / 2) + ','
+    json += '"maxTemp":' + str(maxTemp) + ','
+    json += '"maxTempCell":' + str(maxTempCell) + ','
+    json += '"minTemp":' + str(minTemp) + ','
+    json += '"minTempCell":' + str(minTempCell)
+    json += '}'
+    # print(json)
+    publish(TEMP_TOPIC +'/state', json)
+
 while True:
     get_battery_state()
     get_cell_balance(int(os.environ['CELL_COUNT']))
     get_battery_status()
-    time.sleep(2)
+    get_battery_temp()
+    time.sleep(1)
     
 ser.close()
 print('done')

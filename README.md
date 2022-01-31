@@ -20,5 +20,4 @@ You can do this easily. For power in `W`, just create a template sensor and mult
 Then to get `kWh` for energy you can create an integration sensor from the power sensor. https://www.home-assistant.io/integrations/integration/
 
 ## TODO
-- get temperature
 - get mosfets state
