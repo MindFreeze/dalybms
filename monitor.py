@@ -114,7 +114,6 @@ def get_battery_state():
 
 def get_battery_status():
     res = cmd(b'\xa5\x40\x94\x08\x00\x00\x00\x00\x00\x00\x00\x00\x81')
-    print(res)
     if len(res) < 1:
         print('Empty response get_battery_status')
         return
