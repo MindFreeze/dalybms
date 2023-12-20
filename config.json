@@ -1,6 +1,6 @@
 {
     "name": "Daly Smart BMS",
-    "version": "1.4.2",
+    "version": "1.5.3",
     "slug": "dalybms",
     "description": "Monitors a Daly Smart BMS through UART USB",
     "arch": ["amd64", "armv7", "i386"],

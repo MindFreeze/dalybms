@@ -40,6 +40,10 @@ TEMP_TOPIC = STATE_TOPIC + '_temp'
 tempHaConf = '{"device_class": "temperature", "name": "Battery Temperature", "state_topic": "' + TEMP_TOPIC + '/state", "unit_of_measurement": "°C", "value_template": "{{ value_json.value}}", "unique_id": "' + devId + '_temp", ' + deviceConf + ', "json_attributes_topic": "' + TEMP_TOPIC + '/state"}'
 client.publish(TEMP_TOPIC + '/config', tempHaConf, 0, True)
 
+MOS_TOPIC = STATE_TOPIC + '_mos'
+mosHaConf = '{"name": "MOS status", "state_topic": "' + MOS_TOPIC + '/state", "value_template": "{{ value_json.value}}", "unique_id": "' + devId + '_mos", ' + deviceConf + ', "json_attributes_topic": "' + MOS_TOPIC + '/state"}'
+client.publish(MOS_TOPIC + '/config', mosHaConf, 0, True)
+
 def cmd(command):
     res = []
     ser.write(command)
@@ -157,11 +161,35 @@ def get_battery_temp():
     # print(json)
     publish(TEMP_TOPIC +'/state', json)
 
+def get_battery_mos_status():
+    res = cmd(b'\xa5\x40\x93\x08\x00\x00\x00\x00\x00\x00\x00\x00\x80')
+    if len(res) < 1:
+        print('Empty response get_battery_mos_status')
+        return
+    buffer = res[0]
+    valueByte = int.from_bytes(buffer[4:5], byteorder='big', signed=False)
+    value = 'discharging' if valueByte == 2 else ('charging' if valueByte == 1 else 'idle')
+    chargeMOS = int.from_bytes(buffer[5:6], byteorder='big', signed=False)
+    dischargeMOS = int.from_bytes(buffer[6:7], byteorder='big', signed=False)
+    BMSLife = int.from_bytes(buffer[7:8], byteorder='big', signed=False)
+    residualCapacity = int.from_bytes(buffer[8:12], byteorder='big', signed=False)
+
+    json = '{'
+    json += '"value":"' + value + '",'
+    json += '"chargingMOS":' + str(chargeMOS) + ','
+    json += '"dischargingMOS":' + str(dischargeMOS) + ','
+    json += '"BMSLife":' + str(BMSLife) + ','
+    json += '"residualCapacity":' + str(residualCapacity)
+    json += '}'
+    # print(json)
+    publish(MOS_TOPIC +'/state', json)
+
 while True:
     get_battery_state()
     get_cell_balance(int(os.environ['CELL_COUNT']))
     get_battery_status()
     get_battery_temp()
+    get_battery_mos_status()
     time.sleep(1)
     
 ser.close()
